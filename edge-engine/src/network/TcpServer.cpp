@@ -93,7 +93,17 @@ void TcpServer::start() {
                       << buffer
                       << std::endl;
 
-            // Queue integration will be added next.
+            TelemetryEvent event;
+            event.source_id = "src_001";
+            event.event_id = "evt_1042";
+            event.timestamp = 1725260000;
+            event.payment_token = "tok_demo_123";
+            event.fingerprint = "fp_07";
+            event.payment_failed = true;
+
+            event_queue_.push(event);
+
+            std::cout << "Event queued." << std::endl;
         }
 
         close(client_fd);
