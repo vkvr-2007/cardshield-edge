@@ -1,1 +1,0 @@
-/usr/bin/c++ "CMakeFiles/edge-engine.dir/main.cpp.o" "CMakeFiles/edge-engine.dir/src/network/TcpServer.cpp.o" "CMakeFiles/edge-engine.dir/src/processing/EventProcessor.cpp.o" -o edge-engine 

@@ -30,6 +30,12 @@ void EventProcessor::process_events() {
             state.timestamps.push_back(event.timestamp);
             state.failures.push_back(event.payment_failed);
             state.fingerprints.push_back(event.fingerprint);
+            double request_velocity =
+                static_cast<double>(state.timestamps.size()) / window_size;
+            std::cout << "Request velocity: "
+                      << request_velocity
+                      << " events/sec"
+                      << std::endl;
         }
 
         std::cout << "Worker processed event: "
