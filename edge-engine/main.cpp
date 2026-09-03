@@ -1,6 +1,12 @@
-#include <iostream>
+#include "network/TcpServer.h"
+#include "queue/ThreadSafeQueue.h"
+#include "telemetry/Event.h"
 
 int main() {
-    std::cout << "CardShield Edge engine starting..." << std::endl;
-        return 0;
-        }
+    ThreadSafeQueue<TelemetryEvent> event_queue;
+
+    TcpServer server(8080, event_queue);
+    server.start();
+
+    return 0;
+}
