@@ -1,6 +1,7 @@
 add_executable(edge-engine
     main.cpp
     src/network/TcpServer.cpp
+    src/processing/EventProcessor.cpp
 )
 
 target_include_directories(edge-engine

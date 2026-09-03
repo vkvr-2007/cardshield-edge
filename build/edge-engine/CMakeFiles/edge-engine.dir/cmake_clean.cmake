@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/edge-engine.dir/main.cpp.o.d"
   "CMakeFiles/edge-engine.dir/src/network/TcpServer.cpp.o"
   "CMakeFiles/edge-engine.dir/src/network/TcpServer.cpp.o.d"
+  "CMakeFiles/edge-engine.dir/src/processing/EventProcessor.cpp.o"
+  "CMakeFiles/edge-engine.dir/src/processing/EventProcessor.cpp.o.d"
   "edge-engine"
   "edge-engine.pdb"
 )

@@ -178,6 +178,30 @@ src/network/TcpServer.cpp.s:
 	cd /workspaces/cardshield-edge/build && $(MAKE) $(MAKESILENT) -f edge-engine/CMakeFiles/edge-engine.dir/build.make edge-engine/CMakeFiles/edge-engine.dir/src/network/TcpServer.cpp.s
 .PHONY : src/network/TcpServer.cpp.s
 
+src/processing/EventProcessor.o: src/processing/EventProcessor.cpp.o
+.PHONY : src/processing/EventProcessor.o
+
+# target to build an object file
+src/processing/EventProcessor.cpp.o:
+	cd /workspaces/cardshield-edge/build && $(MAKE) $(MAKESILENT) -f edge-engine/CMakeFiles/edge-engine.dir/build.make edge-engine/CMakeFiles/edge-engine.dir/src/processing/EventProcessor.cpp.o
+.PHONY : src/processing/EventProcessor.cpp.o
+
+src/processing/EventProcessor.i: src/processing/EventProcessor.cpp.i
+.PHONY : src/processing/EventProcessor.i
+
+# target to preprocess a source file
+src/processing/EventProcessor.cpp.i:
+	cd /workspaces/cardshield-edge/build && $(MAKE) $(MAKESILENT) -f edge-engine/CMakeFiles/edge-engine.dir/build.make edge-engine/CMakeFiles/edge-engine.dir/src/processing/EventProcessor.cpp.i
+.PHONY : src/processing/EventProcessor.cpp.i
+
+src/processing/EventProcessor.s: src/processing/EventProcessor.cpp.s
+.PHONY : src/processing/EventProcessor.s
+
+# target to generate assembly for a file
+src/processing/EventProcessor.cpp.s:
+	cd /workspaces/cardshield-edge/build && $(MAKE) $(MAKESILENT) -f edge-engine/CMakeFiles/edge-engine.dir/build.make edge-engine/CMakeFiles/edge-engine.dir/src/processing/EventProcessor.cpp.s
+.PHONY : src/processing/EventProcessor.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -193,6 +217,9 @@ help:
 	@echo "... src/network/TcpServer.o"
 	@echo "... src/network/TcpServer.i"
 	@echo "... src/network/TcpServer.s"
+	@echo "... src/processing/EventProcessor.o"
+	@echo "... src/processing/EventProcessor.i"
+	@echo "... src/processing/EventProcessor.s"
 .PHONY : help
 
 

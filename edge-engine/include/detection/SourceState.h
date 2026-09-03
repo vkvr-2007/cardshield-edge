@@ -6,11 +6,12 @@
 
 struct EventObservation {
     std::int64_t timestamp;
-        bool payment_failed;
-            std::string fingerprint;
-            };
+    bool payment_failed;
+    std::string fingerprint;
+};
 
-            struct SourceState {
-                std::string source_id;
-                    std::deque<EventObservation> recent_events;
-                    };
+struct SourceState {
+    std::deque<std::int64_t> timestamps;
+    std::deque<bool> failures;
+    std::deque<std::string> fingerprints;
+};
