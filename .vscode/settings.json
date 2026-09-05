@@ -1,0 +1,6 @@
+{
+    "cmake.generator": "MinGW Makefiles",
+    "cmake.cCompilerPath": "C:/msys64/ucrt64/bin/gcc.exe",
+    "cmake.cxxCompilerPath": "C:/msys64/ucrt64/bin/g++.exe",
+    "cmake.makefileProgram": "C:/msys64/ucrt64/bin/mingw32-make.exe"
+}

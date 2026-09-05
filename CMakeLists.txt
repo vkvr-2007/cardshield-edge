@@ -20,3 +20,4 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(nlohmann_json)
 
 add_subdirectory(edge-engine)
+add_subdirectory(simulator)
