@@ -1,0 +1,14 @@
+{
+  "classification": "ATTACK",
+  "concentration_score": 0.0,
+  "failure_count": 149,
+  "failure_ratio": 0.7883597883597884,
+  "final_score": 0.7437137055643362,
+  "fingerprint_anomaly_score": 1.0,
+  "request_count": 189,
+  "source_id": "attack_bot_2",
+  "timestamp": 1788591601,
+  "timing_anomaly_score": 0.28602884528199884,
+  "velocity_score": 1.0,
+  "window_duration_seconds": 60
+}

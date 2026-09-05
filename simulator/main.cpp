@@ -4,6 +4,8 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <string>
@@ -33,6 +35,12 @@ constexpr char SERVER_HOST[] = "127.0.0.1";
 constexpr int SERVER_PORT = 8080;
 constexpr char ALPHANUMERIC[] =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+struct DatasetCategory {
+    const char* name;
+    int count;
+    bool attack_label;
+};
 
 void close_socket(Socket socket) {
 #ifdef _WIN32
@@ -187,6 +195,139 @@ void run_attack_bot(
     }
 }
 
+nlohmann::json make_dataset_example(
+    const DatasetCategory& category,
+    int example_index,
+    std::mt19937& generator) {
+    std::uniform_int_distribution<int> request_count_distribution;
+    std::uniform_int_distribution<int> interval_distribution;
+    double failure_probability = 0.05;
+    int distinct_fingerprint_count = 1;
+    int distinct_token_count = 1;
+
+    if (std::string(category.name) == "normal") {
+        request_count_distribution = std::uniform_int_distribution<int>(
+            8,
+            20);
+        interval_distribution = std::uniform_int_distribution<int>(
+            2500,
+            8000);
+        distinct_token_count = 8;
+    } else if (std::string(category.name) == "legitimate_high_volume") {
+        request_count_distribution = std::uniform_int_distribution<int>(
+            40,
+            70);
+        interval_distribution = std::uniform_int_distribution<int>(
+            700,
+            1800);
+        distinct_token_count = 40;
+    } else if (std::string(category.name) == "card_testing_bot") {
+        request_count_distribution = std::uniform_int_distribution<int>(
+            60,
+            100);
+        interval_distribution = std::uniform_int_distribution<int>(
+            50,
+            200);
+        failure_probability = 0.80;
+        distinct_fingerprint_count = 60;
+        distinct_token_count = 90;
+    } else if (std::string(category.name) == "slow_high_failure") {
+        request_count_distribution = std::uniform_int_distribution<int>(
+            5,
+            12);
+        interval_distribution = std::uniform_int_distribution<int>(
+            8000,
+            15000);
+        failure_probability = 0.80;
+        distinct_token_count = 5;
+    } else {
+        request_count_distribution = std::uniform_int_distribution<int>(
+            60,
+            100);
+        interval_distribution = std::uniform_int_distribution<int>(
+            100,
+            100);
+        distinct_fingerprint_count = 2;
+        distinct_token_count = 80;
+    }
+
+    const int request_count = request_count_distribution(generator);
+    std::binomial_distribution<int> failure_distribution(
+        request_count,
+        failure_probability);
+    std::vector<double> inter_arrival_times;
+    inter_arrival_times.reserve(request_count > 0 ? request_count - 1 : 0);
+
+    for (int index = 1; index < request_count; ++index) {
+        inter_arrival_times.push_back(
+            static_cast<double>(interval_distribution(generator)));
+    }
+
+    const int failure_count = failure_distribution(generator);
+    const double failure_ratio = request_count == 0
+        ? 0.0
+        : static_cast<double>(failure_count) / request_count;
+    const double distinct_token_ratio =
+        static_cast<double>(std::min(distinct_token_count, request_count)) /
+        request_count;
+    const double distinct_fingerprint_ratio =
+        static_cast<double>(std::min(
+            distinct_fingerprint_count,
+            request_count)) / request_count;
+
+    return nlohmann::json{
+        {"source_id", std::string(category.name) + "_" +
+            std::to_string(example_index)},
+        {"request_count", request_count},
+        {"failure_count", failure_count},
+        {"failure_ratio", failure_ratio},
+        {"distinct_token_ratio", distinct_token_ratio},
+        {"distinct_fingerprint_ratio", distinct_fingerprint_ratio},
+        {"inter_arrival_times", inter_arrival_times},
+        {"true_label", category.attack_label ? "ATTACK" : "NORMAL"}
+    };
+}
+
+bool generate_dataset() {
+    const std::filesystem::path output_path =
+        std::filesystem::path("dataset") / "full_dataset.jsonl";
+    std::filesystem::create_directories(output_path.parent_path());
+
+    std::ofstream output(output_path);
+    if (!output) {
+        std::cerr << "Could not open dataset output: "
+                  << output_path.string()
+                  << std::endl;
+        return false;
+    }
+
+    std::random_device random_device;
+    std::mt19937 generator(random_device());
+    const DatasetCategory categories[] = {
+        {"normal", 30, false},
+        {"legitimate_high_volume", 10, false},
+        {"card_testing_bot", 20, true},
+        {"slow_high_failure", 10, false},
+        {"regular_low_failure_bot", 10, true}
+    };
+
+    for (const DatasetCategory& category : categories) {
+        for (int index = 1; index <= category.count; ++index) {
+            output << make_dataset_example(
+                category,
+                index,
+                generator).dump()
+                   << '\n';
+        }
+    }
+
+    std::cout << "Wrote dataset: "
+              << output_path.string()
+              << " (80 examples)"
+              << std::endl;
+    return true;
+}
+
 bool parse_arguments(
     int argc,
     char* argv[],
@@ -210,7 +351,8 @@ bool parse_arguments(
             }
         } else if (value == "normal" ||
                    value == "attack" ||
-                   value == "mixed") {
+                   value == "mixed" ||
+                   value == "dataset-gen") {
             mode = value;
         } else {
             return false;
@@ -227,9 +369,14 @@ int main(int argc, char* argv[]) {
     std::string mode;
     if (!parse_arguments(argc, argv, duration_seconds, mode)) {
         std::cerr << "Usage: cardshield-simulator "
-                     "[--mode normal|attack|mixed] [--duration <seconds>]"
+                     "[--mode normal|attack|mixed|dataset-gen] "
+                     "[--duration <seconds>]"
                   << std::endl;
         return 1;
+    }
+
+    if (mode == "dataset-gen") {
+        return generate_dataset() ? 0 : 1;
     }
 
 #ifdef _WIN32
